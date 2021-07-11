@@ -1,5 +1,3 @@
-import { Octokit, App, Action } from "octokit";
-
 const http = require('http');
 const hostname = 'localhost';
 const port = 3005;
@@ -16,7 +14,7 @@ const html = `
 </body>
 </html>
 `
-const server = http.createserver((req, res) => {
+const server = http.createServer((req, res) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html');
     res.end(html);
@@ -26,7 +24,9 @@ server.listen(port, hostname, () => {
     console.log('Server running at http://${hostname}:${port}/');
 });
 
-/*const octokit = new Octokit({auth : "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"});
+/*
+import { Octokit, App, Action } from "octokit";
+const octokit = new Octokit({auth : "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"});
 
 graphql_repos().then(result => {
   var repos = result.user.repositories.nodes
