@@ -1,36 +1,16 @@
-const http = require('http');
-const hostname = 'localhost';
-const port = 3005;
-const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8"/>
-</head>
-<body>
-  <H2>Recently Updated Repositories</H2>
-  <p>Test text</p>
-  <table id=event-table></table>
-</body>
-</html>
-`
-const server = http.createServer((req, res) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/html');
-    res.end(html);
-});
+import { createServer } from "http";
+import { Octokit, App } from "octokit";
+import { config } from "dotenv";
 
-server.listen(port, hostname, () => {
-    console.log('Server running at http://${hostname}:${port}/');
-});
+// Configure environment variables (needed for PAT)
+config();
 
-/*
-import { Octokit, App, Action } from "octokit";
-const octokit = new Octokit({auth : "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"});
+/* Octokit Stuff */
+const octokit = new Octokit({auth : process.env.PAT});
 
 graphql_repos().then(result => {
   var repos = result.user.repositories.nodes
-  console.log(repos);
+  //console.log(repos);
 
   // Put data into html table row formant in one big string
   var tableText = "\
@@ -51,7 +31,7 @@ graphql_repos().then(result => {
       </tr>";
     tableText = tableText.concat(row);
   }
-  document.getElementById("event-table").innerHTML = tableText; //Write to table
+  build(tableText);
 });
 
 async function graphql_repos() {
@@ -75,4 +55,30 @@ async function graphql_repos() {
     }
 `);
 }
-*/
+
+/* Output Values to browser */
+async function build(tableText){
+  const hostname = 'localhost';
+  const port = 3005;
+  const html = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8"/>
+  </head>
+  <body>
+    <H2>Recently Updated Repositories</H2>
+    <table id=event-table>` + tableText + `</table>
+  </body>
+  </html>
+  `
+  const server = createServer((req, res) => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'text/html');
+      res.end(html);
+  });
+
+  server.listen(port, hostname, () => {
+      console.log('Server running at http://${hostname}:${port}/');
+  });
+}
