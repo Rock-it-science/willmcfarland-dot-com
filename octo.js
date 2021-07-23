@@ -67,6 +67,9 @@ async function build(tableText){
     <meta charset="utf-8"/>
   </head>
   <body>
+    
+    <a href="test.html">Go to test page</a>
+
     <H2>Recently Updated Repositories</H2>
     <table id=event-table>` + tableText + `</table>
   </body>
