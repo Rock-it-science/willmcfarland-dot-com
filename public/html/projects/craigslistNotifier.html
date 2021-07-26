@@ -1,0 +1,28 @@
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="stylesheet" type="text/css" href="../gist-style.css">
+</head>
+<body>
+  <img id='home-btn' src='../img/home.png' onclick='document.location="../index.html"'/>
+  <div class="window">
+    <a href='https://github.com/Rock-it-science/craigslist-notifier'>Craigslist Notifier</a>
+    <p>Scrapes craigslist for ads that match a given search and notifies you
+    when a new ad is posted.<br>
+    It uses <a id="inline" href="https://www.crummy.com/software/BeautifulSoup/">beautifulSoup</a> to scrape Craigslist for ads matching a given search
+    criteria, and <a id="inline" href="https://pypi.org/project/notify/">notify</a> to send notifications to the user. <br>
+    The section of code shown below looks for the ads on the page, and creates
+     an array containing the URLs and titles of each ad.<br></p>
+    <script src="https://gist.github.com/Rock-it-science/ab613e3bc1c3012244da80f543532a01.js?file=craigslistNotifier_Snip1.py"></script>
+    <p>The program will then compare the URLs from that arry with those already
+    stored in the existing_ads.txt file (if it doesn't exist, it will be created and left empty for now). If an ad is found
+    that does not already exist in the existing_ads.txt file, then send
+    notification via notify, and add that ad to the txt file.
+    The code block shown below carries out this algorigthm.</p>
+    <script src="https://gist.github.com/Rock-it-science/ab613e3bc1c3012244da80f543532a01.js?file=craigslistNotifier_Snip2.py"></script>
+    <p><b>Sample Run:</b></p>
+    <img id='sampleCap' src='craigslistNotifier/samplepyrun.PNG'/>
+    <img id='sampleCap' src='craigslistNotifier/notifierNotifications.PNG'/>
+  </div>
+</body>
+</html>

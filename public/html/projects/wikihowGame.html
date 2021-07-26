@@ -1,0 +1,61 @@
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="stylesheet" type="text/css" href="../gist-style.css">
+</head>
+<body>
+  <img id='home-btn' src='../img/home.png' onclick='document.location="../index.html"'/>
+  <div class="window">
+    <a href='https://github.com/Rock-it-science/wikihow-game'>Wikihow Game</a><br />
+    <p>A party game where you get to caption WihiHow pictures.<br><br>
+    The index screen displays the buttons to allow selection of host or player.</p>
+    <img id='sampleCap' src='wikihow/index.PNG'/>
+    <p>The guess/player page displays a text entry box to allow players to
+    submit responses.</p>
+    <img id='sampleCap' src='wikihow/player.PNG'/>
+    <p>The code for this page consists of a simple HTML
+    form that submits to a php file called responseSubmit.<br>
+    The responsSubmit file submits the response from the HTML form to the
+    mySQL server. Its really about as simple as a database interaction can get.
+    I ran my server with XAMPP using MariaDB and PHP 7.3.10.<br>
+    The below code sample shows how the php file connects to the database and
+    inserts the response into the response table.
+    </p>
+    <script src="https://gist.github.com/Rock-it-science/014b7fba5f683a40be2882540ac98581.js?file=responseSubmit.php"></script>
+    <p>The picture/host page displays an image, and a timer. While the timer
+    is counting down, submissions are entered by the players.</p>
+    <img id='sampleCap' src='wikihow/host1.PNG'/>
+    <p>The server has a folder of images from wikiHow. I downloaded these images
+    from <a id='inlineLink' href='https://damn.dog/'>damn.dog</a>. The picture page contains an
+    array of the names of all of these images, and selects one at random.<br>
+    The timer is created by updating a HTML element every second using a simple
+    Javascript function (shown below). It works by calculating the time 30
+    seconds from when the page is loaded, and then every second, calculating how
+     much longer until that time is reached.</p>
+    <script src="https://gist.github.com/Rock-it-science/014b7fba5f683a40be2882540ac98581.js?file=timer.js"></script>
+    <p>Its also important to note that the picture page stores the path of the
+    image in a cookie. This will later be used to not only show the picture when
+    we move to another page, but also to reveal what the "correct answer" was.<br>
+    Once the timer has reached 0, the submissions collected from the players
+    as well as the original caption are displayed on-screen.<br>
+    This happens when the picture page calls revealPage.php. This file will
+    first establish another connection to the database in the same way as shown
+    previously. Then, a query will be sent to the database to return all items
+    from the responses table. These responses will then be shown on-screen.
+    Below is the php code that does this.</p>
+    <script src="https://gist.github.com/Rock-it-science/014b7fba5f683a40be2882540ac98581.js?file=getResponses.php"></script>
+    <p>To file path of the image shown on the picture page is loaded from the
+    cookie, and the "correct answer" is shows by modifying the path so as to
+    display what the title of the image was. This is done via the below
+    javascript function.</p>
+    <script src="https://gist.github.com/Rock-it-science/014b7fba5f683a40be2882540ac98581.js?file=showAnswer.js"></script>
+    <p>Finally, there is a javascript function called playAgain, which is really
+    just a way of calling php code through javascript to once more connect to
+    the database, this time to delete all tuples from the responses table, and
+    then to return to the picturePage to start the next round.</p>
+    <script src="https://gist.github.com/Rock-it-science/014b7fba5f683a40be2882540ac98581.js?file=playAgain.js"></script>
+    <p>The resulting reveal page looks something like this</p>
+    <img id='sampleCap' src='wikihow/host2.PNG'/>
+  </div>
+</body>
+</html>

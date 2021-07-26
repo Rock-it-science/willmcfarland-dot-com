@@ -1,0 +1,120 @@
+body {
+  background-color:#008080; /* A E S T H E T I C */
+}
+
+h1, h2, h3, p {
+  font-family: "Lucida Console";
+  color: black;
+  line-height: 1.1;
+  display: inline-block;
+}
+
+.body p {
+  font-family:"Times New Roman";
+}
+
+.side-bio {
+  height: 100%;
+  width: 14%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: white;
+  overflow-x: hidden;
+}
+
+.side-bio p, .side-bio a {
+  color: black;
+}
+
+.side-bio img {
+  width: 100%;
+}
+
+.thumb {
+  width: 50px
+}
+
+.window {
+  margin-left: 17.5%;
+  width: 65%;
+  border: 3px solid black;
+  background-color: #cccccc;
+}
+
+.window H3 {
+  margin-left: 4%;
+}
+
+.window p {
+  color: black;
+  margin-left: 4%;
+}
+
+.window a {
+  color: black;
+  font-size: 25;
+  margin-left: 4%;
+  line-height: 1.5;
+}
+
+.window a:hover {
+  color: blue;
+}
+
+#inline {
+  color: black;
+  font-size: 16;
+  margin-left: 0;
+}
+#inline:hover {
+  color: blue;
+}
+
+#inlineLink {
+  font-size: 16;
+  margin-left: auto;
+  display: inline-block;
+  line-height: 1;
+}
+
+#githubLogo:hover {
+  background-color:#9e9e9e;
+}
+
+#langLogo {
+  height: 20px;
+  margin-left: 8px;
+}
+
+#sampleCap {
+  width: 80%;
+  margin-bottom: 10px;
+  margin-left: 10%;
+}
+
+#home-btn {
+  width: 3%;
+  margin-left: 1%;
+  margin-top: 1%;
+}
+
+#home-btn:hover {
+  background-color: #ffffff;
+}
+
+#home-btn.active {
+  background-color: #4CAF50;
+}
+
+/**For phones**/
+@media (pointer:coarse) {
+  .side-bio {
+    display: none;
+  }
+  .window {
+    margin-left: 10%;
+    width: 80%;
+  }
+}

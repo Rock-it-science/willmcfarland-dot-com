@@ -1,0 +1,259 @@
+<html>
+<meta charset="utf-8"/>
+<header>
+<h1>Brack-it!</h1>
+</header>
+<body>
+<form id='numItemForm' onsubmit="return false">
+  <h3>Number of players: (currently works with 2, 4, or 8)</h3><br>
+  <input type="text" name="numItems" id="numItems">
+  <input type="Submit" value="submit" onclick="nameForm(getElementById('numItems').value)">
+</form>
+
+<form id="playerForm" onsubmit="return false" style="display:none">
+  <h3>Names of players:</h3>
+  <input type="Submit" value="submit" onclick="getNames(getElementById('numItems').value)">
+</form>
+
+<h3 id='instructions' style='display:none'>Click on names of players to advance to next round</h3>
+
+<div id='bracketSpace'></div>
+
+<script>
+function nameForm(numItems){
+  //Get form element
+  var formElement = document.getElementById('playerForm');
+  for(var i=0; i<numItems; i++){//Create a text entry element for each player
+    var textElement = document.createElement('input');
+    textElement.type = 'text';
+    textElement.id = 'player'+i;
+    formElement.appendChild(textElement);
+  }
+
+  //Make form visible
+  formElement.style.display = 'block';
+}
+
+function getNames(numItems){
+  var names = [];
+  for(var i=0; i<numItems; i++){//Put all names in names[]
+    var textElement = document.getElementById('player'+i);
+    names.push(textElement.value);
+  }
+  brackIt(numItems, names);
+}
+
+function brackIt(numItems, names){
+  //Hide forms
+  document.getElementById('numItemForm').style.display = 'none';
+  document.getElementById('playerForm').style.display = 'none';
+  //Show insturctions
+  document.getElementById('instructions').style.display = 'block';
+
+  numItems = parseInt(numItems);
+  console.log('numItems: '+numItems);
+  //complain if numItems is not a number
+  if(!Number.isInteger(numItems)){
+    console.log('that\'s not an integer');
+  }
+
+  /*
+  - Calculate number of rounds based on numItems
+    - NumItems is number of leaves (number of leaves = number of nodes at max depth)
+    - nodes at given depth = 2^depth
+    - Therefore, depth = logb2(numItems)
+  - create a bracket based on numItems and numRounds
+  - all nodes have placeholder names and the leaves have the names of the players
+  - Add ability for players to 'move forward'
+    - Set parent of node to winning player
+  */
+
+  //Create array of numbers from 1 to numItems
+  var numbers = [];
+  for(var i=1; i<=numItems; i++){
+    numbers.push(i);
+  }
+  console.log(numbers);
+
+  //Calculate number of rounds (aka the depth of the bracket-tree), rounding down
+  var numRounds = Math.floor(Math.log2(numItems));
+  console.log('numRounds: '+numRounds);
+  window.numRounds = numRounds;
+
+  //Initialize bracket
+  var bracket = new Bracket();
+  console.log(bracket._root);
+
+  //Call functions for creating the bracket and printing it
+  createBracket(bracket._root, numRounds, names, 1);
+  drawBracket(bracket._root);
+}
+
+function Node(name, id){
+  this.name = name;
+  this.id = id;
+  this.parent = null;
+  this.child1 = null;
+  this.child2 = null;
+}
+
+function Bracket(){
+  var node = new Node(' ', 0);
+  this._root = node;
+}
+var namesIndex = 0;
+var idCounter = 1;
+function createBracket(cNode, numRounds, names, cdepth){
+  /*Creating tree-like bracket
+  - End up with bracket-tree with number of leaves = numItems
+  - Use numRounds = depth of bracket-tree
+  */
+
+  //Check if current depth exceeds numRounds (base case)
+  if(cdepth > numRounds){
+    return;
+  }
+
+  //Check if we are at the desired depth
+  else if(cdepth == numRounds){
+    //If current node has empty child spot, fill it, iterate cdepth, run again on same node
+    if(cNode.child1 == null && cNode.child2 == null){
+      cNode.child1 = new Node(names[namesIndex], idCounter);
+      cNode.child1.parent = cNode;
+      console.log('added leaf node '+cNode.child1.name+' id: '+cNode.child1.id);
+      namesIndex++;
+      idCounter++;
+      cNode.child2 = new Node(names[namesIndex], idCounter);
+      cNode.child2.parent = cNode;
+      console.log('added leaf node '+cNode.child2.name+' id: '+cNode.child2.id);
+      namesIndex++;
+      cdepth++;
+      idCounter++;
+      createBracket(cNode.child1, numRounds, names, cdepth);
+      createBracket(cNode.child2, numRounds, names, cdepth);
+    }
+  }
+  else{//Not at leaf nodes yet (names are just placeholders)
+    if(cNode.child1 == null && cNode.child2 == null){
+      cNode.child1 = new Node(' ', idCounter);
+      cNode.child1.parent = cNode;
+      console.log('non-leaf node id='+cNode.child1.id);
+      idCounter++;
+      cNode.child2 = new Node(' ', idCounter);
+      cNode.child2.parent = cNode;
+      console.log('non-leaf node id='+cNode.child2.id);
+      cdepth++;
+      idCounter++;
+      createBracket(cNode.child1, numRounds, names, cdepth);
+      createBracket(cNode.child2, numRounds, names, cdepth);
+    }
+  }
+}
+
+/*
+
+Change drawing function to start with leaves, then work up to parents
+Skip the parent of every other leaf since half the parents are shared
+
+*/
+
+var svgNS = 'http://www.w3.org/2000/svg';
+//Creating svg area
+var svg = document.createElementNS(svgNS, "svg");
+svg.setAttribute("width", "2000");
+svg.setAttribute("height", "1000");
+function drawBracket(root){
+
+  //Start the drawing process
+  drawNode(root, 0, 500, 290);//TODO Make this dynamic based on number of layers
+
+  //Put everything in the container
+  document.getElementById("bracketSpace").appendChild(svg);
+}
+
+function drawNode(cNode, layer, x, y){
+  //Check base case
+  if(cNode == null){
+    drawLines(1, 500, 300);
+    return;
+  }
+
+  //Initialize text element
+  var textElement = document.createElementNS(svgNS, 'text');
+  textElement.setAttribute("id", cNode.id);
+  textElement.setAttribute("x", x);
+  textElement.setAttribute("y", y);
+  svg.appendChild(textElement);
+  textElement.addEventListener("click", function(){
+    //When user clicks textElement, change parent's name to nNode.name
+    cNode.parent.name = cNode.name;
+    var parentElement = document.getElementById(cNode.parent.id);
+    parentElement.innerHTML = cNode.name;
+  });
+  textElement.innerHTML = cNode.name;
+
+  //Call recursively
+  layer++;
+  drawNode(cNode.child1, layer, x-100, y+(100/layer));
+  drawNode(cNode.child2, layer, x-100, y-(100/layer));
+}
+
+/*Drawing scheme:
+root starts at (500, 300)
+every layer moves:
+  left 100 (x-100)
+  up or down by 100/layer (shifted so text is above lines)
+*/
+
+function drawLines(layer, x, y){
+  //Check base case
+  if(layer > window.numRounds){
+    return;
+  }
+  //Horizontal line from starting parent node, to 10 pixels to the left
+  var lineHoriz1 = document.createElementNS(svgNS, 'line');
+  lineHoriz1.setAttribute("x1", x-5);
+  lineHoriz1.setAttribute("y1", y-15);
+  lineHoriz1.setAttribute("x2", x-15);
+  lineHoriz1.setAttribute("y2", y-15);
+  lineHoriz1.setAttribute("style", "stroke:rgb(0,0,0);stroke-width:2");
+  svg.appendChild(lineHoriz1);
+
+  //Vertical line between the y coords of the 2 child nodes
+  var lineVert = document.createElementNS(svgNS, 'line');
+  lineVert.setAttribute("x1", x-15);
+  lineVert.setAttribute("y1", y-5+(100/layer));
+  lineVert.setAttribute("x2", x-15);
+  lineVert.setAttribute("y2", y-5-(100/layer));
+  lineVert.setAttribute("style", "stroke:rgb(0,0,0);stroke-width:2");
+  svg.appendChild(lineVert);
+
+  //Horizontal line from top of lineVert to child node 1
+  var lineHoriz2 = document.createElementNS(svgNS, 'line');
+  lineHoriz2.setAttribute("x1", x-15);
+  lineHoriz2.setAttribute("y1", y-5+(100/layer));
+  lineHoriz2.setAttribute("x2", x-90);
+  lineHoriz2.setAttribute("y2", y-5+(100/layer));
+  lineHoriz2.setAttribute("style", "stroke:rgb(0,0,0);stroke-width:2");
+  svg.appendChild(lineHoriz2);
+
+  //Horizontal line from bottom of lineVert to child node 2
+  var lineHoriz3 = document.createElementNS(svgNS, 'line');
+  lineHoriz3.setAttribute("x1", x-15);
+  lineHoriz3.setAttribute("y1", y-5-(100/layer));
+  lineHoriz3.setAttribute("x2", x-90);
+  lineHoriz3.setAttribute("y2", y-5-(100/layer));
+  lineHoriz3.setAttribute("style", "stroke:rgb(0,0,0);stroke-width:2");
+  svg.appendChild(lineHoriz3);
+
+  var newy1 = y+(100/layer);
+  var newy2 = y-(100/layer);
+  layer++;
+  drawLines(layer, x-100, newy1);
+  drawLines(layer, x-100, newy2);
+}
+
+</script>
+
+</body>
+</html>
