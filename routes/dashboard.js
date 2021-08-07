@@ -8,39 +8,35 @@ const octokit = new Octokit({auth : process.env.PAT});
 
 //Express
 var express = require('express');
+const { table } = require('console');
 var router = express.Router();
 
-//GET
-router.get('/', function(req, res, next) {
-  recent_10_repos().then(result => {
-    var repos = result.user.repositories.nodes
-    //console.log(repos);
-
-    // Put data into html table row formant in one big string
-    var tableText = "<table>\
-      <tr style=\"text-align:center;\">\
-        <th>Repository</th>\
-        <th>Description</th>\
-        <th>Recent Push</th>\
-        <th>Languages</th>\
-      </tr>\
-      "
-    for (var i = 0; i < repos.length; i++){
-      var row = 
-        "<tr>\
-        <td><a href=" + repos[i].url + ">" + repos[i].name + "</a></td>\
-        <td>" + repos[i].description + "</td>\
-        <td>" + repos[i].pushedAt + "</td>\
-        <td style=\"text-align:center;\">";
-        for (var j = 0; j < repos[i].languages.nodes.length; j++){
-          row = row.concat("<p style=\"color: white; background-color:" + repos[i].languages.nodes[j].color + ";\">" + repos[i].languages.nodes[j].name) + "</p><br/>";
+//Query results
+router.get('/pinned', function(req, res, next){
+    pinned_repos().then(result => {
+        var repos = result.user.pinnedItems.nodes;
+    
+        // Put data into html table row formant in one big string
+        var tableText = "document.write(\x27";
+        for (var i = 0; i < repos.length; i++){
+          var row = 
+            "<tr>\
+            <td><a href=" + repos[i].url + ">" + repos[i].name + "</a></td>\
+            <td>" + repos[i].description + "</td>\
+            <td style=\"text-align:center;\">";
+            for (var j = 0; j < repos[i].languages.nodes.length; j++){
+              row = row.concat("<p style=\"color: white; background-color:" + repos[i].languages.nodes[j].color + ";\">" + repos[i].languages.nodes[j].name + "</p><br/>");
+            }
+            row = row.concat("</td>");
+            for (var j = 0; j < repos[i].repositoryTopics.nodes.length; j++){
+                row = row.concat("<p>" + repos[i].repositoryTopics.nodes[j].name);
+            }
+            row = row.concat("</td></tr>");
+          tableText = tableText.concat(row);
         }
-        row = row.concat("</td></tr>");
-      tableText = tableText.concat(row);
-    }
-    tableText = tableText.concat('</table>');
-    res.send(tableText);
-  });
+        tableText = tableText.concat("\x27;")
+        res.send(tableText);
+      });
 });
 
 module.exports = router;
