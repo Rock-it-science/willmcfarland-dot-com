@@ -46,6 +46,7 @@ router.get('/pinned', function(req, res, next){
 //Get most used languages
 router.get('/languages', function(req, res, next){
   repo_languages().then(result => {
+
     var repos = result.user.repositories.nodes;
     
     //First make an array of all languages in the result
@@ -77,21 +78,45 @@ router.get('/languages', function(req, res, next){
     //Percent of total
     var total_size = 0;
     for(var i=0; i<size.length; i++){
-      total_size = total_size + parseInt(size[l]);
+      total_size = total_size + parseInt(size[i]);
     }
+
     var percent = [];
-    for(l in size){
-      percent.push(l / total_size * 100);
+    for(var i=0; i<size.length; i++){
+      percent.push(size[i] / total_size * 100);
     }
 
     //Put it all in one multi-d array
     lang_size_perc = [];
-    for(var i = 0; i < lang.length; i++){
-      lang_size_perc.push(lang[i], size[i], percent[i]);
+    for(var i=0; i < lang.length; i++){
+      lang_size_perc.push([lang[i], size[i], percent[i]]);
     }
 
+    //Put array in descending order of percentage
+    lang_size_perc.sort(function(a, b) {
+        if (a[0] === b[0]) {
+            return 0;
+        }
+        else {
+            return (a[2] < b[2]) ? 1 : -1;
+        }
+      }
+    );
+
+    //Put that data into the html format
+    var lang_html = "document.write(\x27";
+    for(var i=0; i < Math.min(10, lang_size_perc.length); i++){
+      lang_html = lang_html.concat('\
+        <h4 class="small fw-bold">' + lang_size_perc[i][0] + '<span class="float-end">' + lang_size_perc[i][2].toFixed(2) + '%</span></h4> \
+        <div class="progress mb-4"> \
+          <div class="progress-bar bg-danger" aria-valuenow="' + lang_size_perc[i][2] + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + lang_size_perc[i][2] + '%;"><span class="visually-hidden">' + lang_size_perc[i][2] + '%</span></div> \
+        </div> \
+      ');
+    }
+    lang_html = lang_html.concat("\x27);");
+
     res.type('js');
-    res.send("console.log(\x27" + total_size + "\x27)");
+    res.send(lang_html);
   })
 });
 
