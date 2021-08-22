@@ -51,11 +51,15 @@ router.get('/languages', function(req, res, next){
     
     //First make an array of all languages in the result
     var lang = [];
+    var col = [];
     var l = "";
+    var color = "";
     for(var i = 0; i < repos.length; i++){
       for(var j = 0; j < repos[i].languages.edges.length; j++){
         l = repos[i].languages.edges[j].node.name;
+        color = repos[i].languages.edges[j].node.color;
         if(!(lang.includes(l))){
+          col.push(color);
           lang.push(l);
         }
       }
@@ -87,29 +91,29 @@ router.get('/languages', function(req, res, next){
     }
 
     //Put it all in one multi-d array
-    lang_size_perc = [];
+    lang_col_size_perc = [];
     for(var i=0; i < lang.length; i++){
-      lang_size_perc.push([lang[i], size[i], percent[i]]);
+      lang_col_size_perc.push([lang[i], col[i], size[i], percent[i]]);
     }
 
     //Put array in descending order of percentage
-    lang_size_perc.sort(function(a, b) {
+    lang_col_size_perc.sort(function(a, b) {
         if (a[0] === b[0]) {
             return 0;
         }
         else {
-            return (a[2] < b[2]) ? 1 : -1;
+            return (a[3] < b[3]) ? 1 : -1;
         }
       }
     );
 
     //Put that data into the html format
     var lang_html = "document.write(\x27";
-    for(var i=0; i < Math.min(10, lang_size_perc.length); i++){
+    for(var i=0; i < Math.min(10, lang_col_size_perc.length); i++){
       lang_html = lang_html.concat('\
-        <h4 class="small fw-bold">' + lang_size_perc[i][0] + '<span class="float-end">' + lang_size_perc[i][2].toFixed(2) + '%</span></h4> \
+        <h4 class="small fw-bold">' + lang_col_size_perc[i][0] + '<span class="float-end">' + lang_col_size_perc[i][3].toFixed(2) + '%</span></h4> \
         <div class="progress mb-4"> \
-          <div class="progress-bar bg-danger" aria-valuenow="' + lang_size_perc[i][2] + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + lang_size_perc[i][2] + '%;"><span class="visually-hidden">' + lang_size_perc[i][2] + '%</span></div> \
+          <div class="progress-bar" aria-valuenow="' + lang_col_size_perc[i][3] + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + lang_col_size_perc[i][3] + '%; background-color: ' + lang_col_size_perc[i][1] + '"><span class="visually-hidden">' + lang_col_size_perc[i][3] + '%</span></div> \
         </div> \
       ');
     }
@@ -191,6 +195,7 @@ async function repo_languages() {
             edges {
               node {
                 name
+                color
               }
               size
             }
