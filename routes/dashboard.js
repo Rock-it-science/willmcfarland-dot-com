@@ -124,6 +124,65 @@ router.get('/languages', function(req, res, next){
   })
 });
 
+//Get recent commits
+router.get('/contributions', function(req, res, next){
+  contributions().then(result => {
+      var contribution_weeks = result.user.contributionsCollection.contributionCalendar.weeks;
+      
+      //Flatten weeks into a single array - 1 entry per day
+      var contribution_days = [];
+      for(var w=0; w<contribution_weeks.length; w++){
+        for(var d=0; d<contribution_weeks[w].contributionDays.length; d++){
+          contribution_days.push(contribution_weeks[w].contributionDays[d]);
+        }
+      }
+
+      //Aggregate by month
+      var contribution_months = [];
+      var months = [];
+      // Go through every single day. If new month, create new month create new entry in contribution_months. Otherwise update existing entry.
+      for(var d=0; d<contribution_days.length; d++){
+        var month = contribution_days[d].date.substr(0, 7);
+        if(!months.includes(month)){//New month
+          contribution_months.push([month, contribution_days[d].contributionCount]);
+          months.push(month);
+          //console.log("New month: " + month + ", " + contribution_days[d].contributionCount + " contributions.")
+        } else{
+          contribution_months[months.indexOf(month)][1] = contribution_months[months.indexOf(month)][1] + contribution_days[d].contributionCount;
+          //console.log("Updating month " + month + ", " + contribution_days[d].contributionCount + " new contributions, total now " + contribution_months[months.indexOf(month)][1]);
+        }
+      }
+
+      console.log(months.toString());
+
+      //Add '&quot;' around all strings
+      contributions_strings = [];
+      months_strings = [];
+      for(var i=0; i<contribution_months.length; i++){
+        months_strings.push('&quot;' + contribution_months[i][0] + '&quot;');
+        contributions_strings.push('&quot;' + contribution_months[i][1] + '&quot;');
+      }
+
+      // Put data into html canvas element
+      var canvas_html = 'document.write(\x27 \
+        <div><canvas data-bss-chart="{ \
+          &quot;type&quot;:&quot;bar&quot;,\
+          &quot;data&quot;:\
+            {&quot;labels&quot;:\
+              [' + months_strings.toString() + '], \
+            &quot;datasets&quot;:[{ \
+              &quot;label&quot;:&quot;Commits&quot;, \
+              &quot;backgroundColor&quot;:&quot;#4e73df&quot;, \
+              &quot;borderColor&quot;:&quot;#4e73df&quot;, \
+              &quot;data&quot;:[' + contributions_strings.toString() + '], \
+              &quot;fill&quot;:true}]}, \
+              &quot;options&quot;:{&quot;maintainAspectRatio&quot;:true,&quot;legend&quot;:{&quot;display&quot;:false,&quot;labels&quot;:{&quot;bold&quot;:false,&quot;italic&quot;:false,&quot;fontStyle&quot;:&quot;normal&quot;}},&quot;title&quot;:{&quot;fontStyle&quot;:&quot;bold&quot;}}}"></canvas></div>\x27);';
+
+      res.type('js');
+      res.send(canvas_html);
+    });
+});
+
 module.exports = router;
 
 
@@ -204,5 +263,26 @@ async function repo_languages() {
       }
     }
   }
-  `)
+  `);
+}
+
+async function contributions() {
+  return await octokit.graphql(`
+  {
+    user(login: "Rock-it-science") {
+      contributionsCollection {
+        contributionCalendar {
+          weeks {
+            contributionDays {
+              contributionCount
+              contributionLevel
+              date
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  `);
 }
