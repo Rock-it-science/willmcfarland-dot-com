@@ -124,7 +124,7 @@ router.get('/languages', function(req, res, next){
   })
 });
 
-//Get recent commits
+//Get commits over time
 router.get('/contributions', function(req, res, next){
   contributions().then(result => {
       var contribution_weeks = result.user.contributionsCollection.contributionCalendar.weeks;
@@ -183,12 +183,41 @@ router.get('/contributions', function(req, res, next){
     });
 });
 
+//Get recent repositories
+router.get('/repos', function(req, res, next){
+  recent_repos().then(result => {
+      var repos = result.user.repositories.nodes;
+  
+      // Put data into html table row formant in one big string
+      var tableText = "document.write(\x27";
+      for (var i = 0; i < repos.length; i++){
+        var row = 
+          "<tr>\
+          <td><a href=" + repos[i].url + ">" + repos[i].name + "</a></td>\
+          <td>" + repos[i].description + "</td>\
+          <td style=\"text-align:center;\">";
+          for (var j = 0; j < repos[i].languages.nodes.length; j++){
+            row = row.concat("<p style=\"color: white; background-color:" + repos[i].languages.nodes[j].color + ";\">" + repos[i].languages.nodes[j].name + "</p>");
+          }
+          row = row.concat("</td>");
+          for (var j = 0; j < repos[i].repositoryTopics.nodes.length; j++){
+              row = row.concat("<p>" + repos[i].repositoryTopics.nodes[j].name);
+          }
+          row = row.concat("</td></tr>");
+        tableText = tableText.concat(row);
+      }
+      tableText = tableText.concat("\x27);")
+      res.type('js');
+      res.send(tableText);
+    });
+});
+
 module.exports = router;
 
 
 /*GraphQL Queries */
 
-async function recent_10_repos() {
+async function recent_repos() {
   return await octokit.graphql(`
   {
     user(login: "Rock-it-science") {
@@ -202,6 +231,13 @@ async function recent_10_repos() {
             nodes {
               name
               color
+            }
+          }
+          repositoryTopics(first:10){
+            nodes{
+              topic{
+                name
+              }
             }
           }
         }
