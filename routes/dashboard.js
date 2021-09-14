@@ -30,11 +30,11 @@ router.get('/pinned', function(req, res, next){
             for (var j = 0; j < repos[i].languages.nodes.length; j++){
               row = row.concat("<p style=\"color: white; background-color:" + repos[i].languages.nodes[j].color + ";\">" + repos[i].languages.nodes[j].name + "</p>");
             }
-            row = row.concat("</td>");
+            row = row.concat("</td><td><p>");
             for (var j = 0; j < repos[i].repositoryTopics.nodes.length; j++){
-                row = row.concat("<p>" + repos[i].repositoryTopics.nodes[j].name);
+                row = row.concat(repos[i].repositoryTopics.nodes[j].topic.name + ", ");
             }
-            row = row.concat("</td></tr>");
+            row = row.concat("</p></td></tr>");
           tableText = tableText.concat(row);
         }
         tableText = tableText.concat("\x27);")
@@ -199,11 +199,12 @@ router.get('/repos', function(req, res, next){
           for (var j = 0; j < repos[i].languages.nodes.length; j++){
             row = row.concat("<p style=\"color: white; background-color:" + repos[i].languages.nodes[j].color + ";\">" + repos[i].languages.nodes[j].name + "</p>");
           }
-          row = row.concat("</td>");
+          row = row.concat("<td><p>" + repos[i].pushedAt.substr(0, 10) + "</p></td>");
+          row = row.concat("</td><td><p>");
           for (var j = 0; j < repos[i].repositoryTopics.nodes.length; j++){
-              row = row.concat("<p>" + repos[i].repositoryTopics.nodes[j].name);
+              row = row.concat(repos[i].repositoryTopics.nodes[j].topic.name) + ", ";
           }
-          row = row.concat("</td></tr>");
+          row = row.concat("</p></td></tr>");
         tableText = tableText.concat(row);
       }
       tableText = tableText.concat("\x27);")
