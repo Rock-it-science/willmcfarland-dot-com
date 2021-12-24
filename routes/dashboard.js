@@ -20,11 +20,11 @@ router.get('/pinned', function(req, res, next){
         var repos = result.user.pinnedItems.nodes;
     
         // Put data into html table row formant in one big string
-        var tableText = "document.write(\x27";
+        var tableText = "";
         for (var i = 0; i < repos.length; i++){
           var row = 
             "<tr>\
-            <td><a href=" + repos[i].url + ">" + repos[i].name + "</a></td>\
+            <td><a href=" + repos[i].url + ">" + repos[i].name.replace('\'','') + "</a></td>\
             <td>" + repos[i].description + "</td>\
             <td style=\"text-align:center;\">";
             for (var j = 0; j < repos[i].languages.nodes.length; j++){
@@ -37,7 +37,7 @@ router.get('/pinned', function(req, res, next){
             row = row.concat("</p></td></tr>");
           tableText = tableText.concat(row);
         }
-        tableText = tableText.concat("\x27);")
+        tableText = "document.write(\x27" + tableText.replace('\'', '') + "\x27);";
         res.type('js');
         res.send(tableText);
       });
@@ -189,7 +189,7 @@ router.get('/repos', function(req, res, next){
       var repos = result.user.repositories.nodes;
   
       // Put data into html table row formant in one big string
-      var tableText = "document.write(\x27";
+      var tableText = "";
       for (var i = 0; i < repos.length; i++){
         var row = 
           "<tr>\
@@ -207,7 +207,7 @@ router.get('/repos', function(req, res, next){
           row = row.concat("</p></td></tr>");
         tableText = tableText.concat(row);
       }
-      tableText = tableText.concat("\x27);")
+      tableText = "document.write(\x27" + tableText.replace('\'', '') + "\x27);";
       res.type('js');
       res.send(tableText);
     });
