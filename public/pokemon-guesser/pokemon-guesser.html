@@ -2,13 +2,17 @@
     <head>
         <meta charset="utf-8">
         <title>Pokemon Guesser</title>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <body>
         <h1>Pokemon Guesser</h1>
         <h2>Think of a Pokemon. When you're ready, start answering the questions below.</h2>
         <span>
             <p id='question'></p>
-            <input type='text' id='answer'>
+            <form>
+                <input type='text' id='answer'>
+                <input type='submit' value='Submit'>
+            </form>
         </span>
         <script src="/pokemon-guesser"></script>
     </body>

@@ -9,7 +9,7 @@ affirm = ['yes', 'true', 'y', '1']
 
 # Create the classification tree
 # Load data
-df = pd.read_csv('data/pokemon_preprocessed.csv')
+df = pd.read_csv('./routes/pokemon-guesser/data/pokemon_preprocessed.csv')
 
 X = df.drop(['name', 'pokedex_number'] , axis=1)
 y = df['pokedex_number']
@@ -44,7 +44,7 @@ while True:
     else: message = feature
 
     # Print rule
-    v = input(f"{message} ")
+    v = input(message)
 
     if v.lower() not in affirm:
         node = tree.children_left[node]

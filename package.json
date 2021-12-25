@@ -13,6 +13,8 @@
     "html": "^1.0.0",
     "http-errors": "~1.6.3",
     "jade": "^0.29.0",
+    "jquery": "^3.6.0",
+    "jsdom": "^19.0.0",
     "morgan": "~1.9.1",
     "octokit": "^1.1.0",
     "python-shell": "^3.0.1"
