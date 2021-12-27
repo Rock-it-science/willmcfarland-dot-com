@@ -9,8 +9,8 @@
         <h2>Think of a Pokemon. When you're ready, start answering the questions below.</h2>
         <span>
             <p id='question'></p>
-            <form>
-                <input type='text' id='answer'>
+            <form id='answerForm' action='/pokemon-guesser/guess' method='post'>
+                <input type='text' id='answer' name='answer'>
                 <input type='submit' value='Submit'>
             </form>
         </span>

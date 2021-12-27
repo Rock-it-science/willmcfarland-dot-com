@@ -1,5 +1,6 @@
 import sys
 
-message = sys.stdin.readline()
-print(message)
-sys.flush()
+while True:
+    message = sys.stdin.readline()
+    print(message)
+    sys.stdout.flush()
