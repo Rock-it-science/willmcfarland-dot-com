@@ -40,8 +40,8 @@ function startScript(req, res, next){
         } else {
             console.log('question not set');
         }
-        res.end();
     }
+    res.end();
 }
 
 function input(req, res, next){
