@@ -28,11 +28,14 @@ router.get('/pinned', function(req, res, next){
             <td>" + repos[i].description + "</td>\
             <td style=\"text-align:center;\">";
             for (var j = 0; j < repos[i].languages.nodes.length; j++){
-              row = row.concat("<p style=\"color: white; background-color:" + repos[i].languages.nodes[j].color + ";\">" + repos[i].languages.nodes[j].name + "</p>");
+              var langName = repos[i].languages.nodes[j].name.replace(' ',''); // Remove spaces from name for shield
+              var langColor = repos[i].languages.nodes[j].color.substring(1); // Remove first character (#) for shield
+              row = row.concat("<img src=https://img.shields.io/badge/"+ langName +"-informational?style=flat&logo="+ langName.toLowerCase() +"&logoColor=white&color="+ langColor +">");
             }
             row = row.concat("</td><td><p>");
             for (var j = 0; j < repos[i].repositoryTopics.nodes.length; j++){
-                row = row.concat(repos[i].repositoryTopics.nodes[j].topic.name + ", ");
+                var tagName = repos[i].repositoryTopics.nodes[j].topic.name.replace('-',''); // Remove hyphens from name for shield
+                row = row.concat("<img src=https://img.shields.io/badge/"+ tagName +"-informational?style=flat&color=blue> ");
             }
             row = row.concat("</p></td></tr>");
           tableText = tableText.concat(row);
@@ -203,18 +206,28 @@ router.get('/repos', function(req, res, next){
       // Put data into html table row formant in one big string
       var tableText = "";
       for (var i = 0; i < repos.length; i++){
+        var repoDesc = '';
+        if(repos[i].description != null){
+          repoDesc = repos[i].description;
+        }
         var row = 
           "<tr>\
           <td><a href=" + repos[i].url + ">" + repos[i].name + "</a></td>\
-          <td>" + repos[i].description + "</td>\
+          <td>" + repoDesc + "</td>\
           <td style=\"text-align:center;\">";
+          // Languages
           for (var j = 0; j < repos[i].languages.nodes.length; j++){
-            row = row.concat("<p style=\"color: white; background-color:" + repos[i].languages.nodes[j].color + ";\">" + repos[i].languages.nodes[j].name + "</p>");
+            var langName = repos[i].languages.nodes[j].name.replace(' ',''); // Remove spaces from name for shield
+            var langColor = repos[i].languages.nodes[j].color.substring(1); // Remove first character (#) for shield
+            row = row.concat("<img src=https://img.shields.io/badge/"+ langName +"-informational?style=flat&logo="+ langName.toLowerCase() +"&logoColor=white&color="+ langColor +">");
           }
+          // Recent Commit
           row = row.concat("<td><p>" + repos[i].pushedAt.substr(0, 10) + "</p></td>");
+          // Tags
           row = row.concat("</td><td><p>");
           for (var j = 0; j < repos[i].repositoryTopics.nodes.length; j++){
-              row = row.concat(repos[i].repositoryTopics.nodes[j].topic.name) + ", ";
+            var tagName = repos[i].repositoryTopics.nodes[j].topic.name.replace('-',''); // Remove hyphens from name for shield
+            row = row.concat("<img src=https://img.shields.io/badge/"+ tagName +"-informational?style=flat&color=blue> ");
           }
           row = row.concat("</p></td></tr>");
         tableText = tableText.concat(row);
