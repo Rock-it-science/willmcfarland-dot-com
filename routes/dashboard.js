@@ -47,6 +47,10 @@ router.get('/pinned', function(req, res, next){
 router.get('/languages', function(req, res, next){
   repo_languages().then(result => {
 
+    // List of languages and repos to exclude due to containing large data files that skew results
+    var excludeRepos = ['lab-7---introduction-to-php-Rock-it-science'];
+    var excludeLanguages = ['Jupyter Notebook', 'CSS'];
+
     var repos = result.user.repositories.nodes;
     
     //First make an array of all languages in the result
@@ -58,7 +62,7 @@ router.get('/languages', function(req, res, next){
       for(var j = 0; j < repos[i].languages.edges.length; j++){
         l = repos[i].languages.edges[j].node.name;
         color = repos[i].languages.edges[j].node.color;
-        if(!(lang.includes(l))){
+        if(!(lang.includes(l)) && !(excludeLanguages.includes(l))){
           col.push(color);
           lang.push(l);
         }
@@ -68,13 +72,21 @@ router.get('/languages', function(req, res, next){
     //Aggregate; sum size by language name
     var size = [];
     for(var i = 0; i < repos.length; i++){
-      for(var j = 0; j < repos[i].languages.edges.length; j++){//For every language in this repo
-        //Add to size total for this language
-        var lang_index = lang.indexOf(repos[i].languages.edges[j].node.name);
-        if(size[lang_index]){
-          size[lang_index] = size[lang_index] + repos[i].languages.edges[j].size;
-        } else{
-          size[lang_index] = repos[i].languages.edges[j].size;
+      // Skip excluded repos
+      console.log(repos[i].name);
+      if(!excludeRepos.includes(repos[i].name)){
+        for(var j = 0; j < repos[i].languages.edges.length; j++){//For every language in this repo
+          //console.log('  ' + repos[i].languages.edges[j].node.name + ': ' + repos[i].languages.edges[j].size);
+          // Skip excluded languages
+          if(!excludeLanguages.includes(repos[i].languages.edges[j].node.name)){
+            //Add to size total for this language
+            var lang_index = lang.indexOf(repos[i].languages.edges[j].node.name);
+            if(size[lang_index]){
+              size[lang_index] = size[lang_index] + repos[i].languages.edges[j].size;
+            } else{
+              size[lang_index] = repos[i].languages.edges[j].size;
+            }
+          }
         }
       }
     }
